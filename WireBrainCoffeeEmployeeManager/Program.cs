@@ -2,15 +2,17 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using WireBrainCoffeeEmployeeManager.Data;
+using WireBrainCoffeeEmployeeManager.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
 // Add services to the container.
-builder.Services.AddDbContextFactory<ApplicationDbContext>(
-    opt => opt.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddDbContextFactory<ApplicationDbContext>(
+    opt => opt.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<StateContainer>();
 
 var app = builder.Build();
 

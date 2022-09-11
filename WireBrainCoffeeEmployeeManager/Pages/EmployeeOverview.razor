@@ -1,6 +1,7 @@
 @page "/employees/list/{currentPage:int?}"
 @inject IDbContextFactory<ApplicationDbContext> ContextFactory;
 @inject NavigationManager NavigationManager
+@inject StateContainer StateContainer
 
 <PageTitle>Employee Overview</PageTitle>
 
@@ -31,20 +32,25 @@ else
     <table class="table table-striped">
         <thead>
         <tr>
+            <th>#</th>
             <th>FirstName</th>
             <th>LastName</th>
             <th>Is Developer</th>
-            <th>Depoartment</th>
+            <th>Department</th>
         </tr>
         </thead>
         <tbody>
         @foreach (var employee in Employees)
         {
             <tr>
+                <td>
+                    <a href="/employees/edit/@employee.Id" class="btn btn-outline-primary">Edit</a>
+                </td>
                 <td>@employee.FirstName</td>
                 <td>@employee.LastName</td>
                 <td>@employee.IsDeveloper</td>
                 <td>@employee.Department?.Name</td>
+
             </tr>
         }
         </tbody>
@@ -76,6 +82,8 @@ else
            NavigationManager.NavigateTo(($"/employees/list/{TotalPages}"));
            return;
        }
+
+       StateContainer.EmployeeOverviewPage = CurrentPage.Value;
        
       var itemsToSkip = (CurrentPage.Value - 1) * ItemsPerPage;
        
