@@ -2,6 +2,7 @@
 @inject IDbContextFactory<ApplicationDbContext> ContextFactory;
 @inject NavigationManager NavigationManager
 @inject StateContainer StateContainer
+@inject IJSRuntime JsRuntime
 
 <PageTitle>Employee Overview</PageTitle>
 
@@ -43,8 +44,9 @@ else
         @foreach (var employee in Employees)
         {
             <tr>
-                <td>
+                <td class="btn-group-sm">
                     <a href="/employees/edit/@employee.Id" class="btn btn-outline-primary">Edit</a>
+                    <button class="btn btn-outline-danger" @onclick="() => HandleDelete(employee)">Delete</button>
                 </td>
                 <td>@employee.FirstName</td>
                 <td>@employee.LastName</td>
@@ -65,15 +67,20 @@ else
    [Parameter]
    public int? CurrentPage { get; set; }
 
-   protected override async Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadData();
+    }
+
+   private async Task LoadData()
    {
        if (CurrentPage is null or < 1)
        {
            NavigationManager.NavigateTo("/employees/list/1");
            return;
        }
-       
-      using var context = ContextFactory.CreateDbContext();
+
+      await using var context = await ContextFactory.CreateDbContextAsync();
       var employeeCount = await context.Employees.CountAsync();
       TotalPages = employeeCount == 0 ? 1 : (int)System.Math.Ceiling((double)employeeCount / ItemsPerPage);
 
@@ -94,4 +101,19 @@ else
           .Take(ItemsPerPage)
           .ToArrayAsync();
    }
+
+    private async Task HandleDelete(Employee employee)
+    {
+        var isOk = await JsRuntime.InvokeAsync<bool>("confirm", 
+            $"Delete employee {employee.FirstName} {employee.LastName}?");
+
+        if (isOk)
+        {
+            await using var context = await ContextFactory.CreateDbContextAsync();
+            context.Employees.Remove(employee);
+            await context.SaveChangesAsync();
+
+            await LoadData();
+        }
+    }
 }
