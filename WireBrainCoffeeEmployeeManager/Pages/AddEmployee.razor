@@ -1,0 +1,120 @@
+@page "/employees/add"
+@inject IDbContextFactory<ApplicationDbContext> ContextFactory;
+
+<PageTitle>Add Employee</PageTitle>
+
+<h3>Add Employee</h3>
+
+@if (Employee is not null)
+{
+    <EditForm Model="@Employee" OnValidSubmit="@HandleValidSubmit"
+              OnInvalidSubmit="@HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        <div class="mb-3">
+            <label for="firstname" class="form-label">FirstName</label>
+            <InputText id="firstname" class="form-control" @bind-Value="Employee.FirstName" />
+            <ValidationMessage For="() => Employee.FirstName" />
+        </div>
+        <div class="mb-3">
+            <label for="lastname" class="form-label">LastName</label>
+            <InputText id="lastname" class="form-control" @bind-Value="Employee.LastName" />
+            <ValidationMessage For="() => Employee.LastName" />
+        </div>
+      
+        <div class="mb-3">
+            <label for="department" class="form-label">Department</label>
+            <InputSelect id="department" class="form-select" @bind-Value="Employee.DepartmentId">
+                @if (Departments is not null)
+                {
+                    @foreach (var department in Departments)
+                    {
+                        <option value="@department.Id">@department.Name</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Employee.IsDeveloper" />
+        </div>
+        <div class="mb-3">
+            <label for="IsDeveloper" class="form-label">Is Developer:
+                <InputCheckbox id="IsDeveloper" class="form-check-input" @bind-Value="Employee.IsDeveloper" />
+            </label>
+            <ValidationMessage For="() => Employee.IsDeveloper" />
+        </div>
+        <button type="submit" class="btn btn-primary" disabled="@IsBusy">Add</button>
+    </EditForm>
+    
+    @if (SuccessMessage is not null)
+    {
+        <br/>
+        <div class="alert alert-success">@SuccessMessage</div>
+    }
+    
+    @if (ErrorMessage is not null)
+    {
+        <br/>
+        <div class="alert alert-danger">@ErrorMessage</div>
+    }
+}
+
+@code {
+    private Employee? Employee { get; set; }
+    private Department[]? Departments { get; set; }
+    private string? SuccessMessage { get; set; }
+    private string? ErrorMessage { get; set; }
+    private bool? IsBusy { get; set; } 
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = await ContextFactory.CreateDbContextAsync();
+        Departments = await context.Departments
+            .OrderBy(dept => dept.Name)
+            .ToArrayAsync();
+                
+        Employee = new()
+        {
+            DepartmentId = Departments.FirstOrDefault()?.Id
+        };
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (IsBusy)
+        {
+            return;
+        }
+        IsBusy = true;
+        try
+        {
+            if (Employee is not null)
+            {
+                using var context = await ContextFactory.CreateDbContextAsync();
+
+                context.Employees.Add(Employee);
+                await context.SaveChangesAsync();
+
+                SuccessMessage = $"Employee {Employee.FirstName} and {Employee.LastName} was added successfully!";
+                ErrorMessage = null;
+                // New Employee
+                Employee = new()
+                {
+                    DepartmentId = Employee.DepartmentId
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            SuccessMessage = null;
+            ErrorMessage = $"Error while adding an employee: {DateTime.Now} - {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+       
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        SuccessMessage = null;
+        ErrorMessage = null;
+    }
+}
