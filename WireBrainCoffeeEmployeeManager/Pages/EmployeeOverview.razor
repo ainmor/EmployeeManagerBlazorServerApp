@@ -109,10 +109,17 @@ else
 
         if (isOk)
         {
-            await using var context = await ContextFactory.CreateDbContextAsync();
-            context.Employees.Remove(employee);
-            await context.SaveChangesAsync();
-
+            try
+            {
+                await using var context = await ContextFactory.CreateDbContextAsync();
+                context.Employees.Remove(employee);
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+               // If we get this exception, the employee was deleted or modified.
+               // As we reload the data below, let's ignore this exception.
+            }
             await LoadData();
         }
     }

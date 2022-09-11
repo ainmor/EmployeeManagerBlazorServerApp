@@ -92,6 +92,11 @@ namespace WireBrainCoffeeEmployeeManager.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<byte>("Timestamp")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tinyint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
@@ -105,7 +110,8 @@ namespace WireBrainCoffeeEmployeeManager.Data.Migrations
                             DepartmentId = 2,
                             FirstName = "Ain",
                             IsDeveloper = false,
-                            LastName = "Mor"
+                            LastName = "Mor",
+                            Timestamp = (byte)0
                         },
                         new
                         {
@@ -113,7 +119,8 @@ namespace WireBrainCoffeeEmployeeManager.Data.Migrations
                             DepartmentId = 5,
                             FirstName = "Suresh",
                             IsDeveloper = true,
-                            LastName = "Mor"
+                            LastName = "Mor",
+                            Timestamp = (byte)0
                         },
                         new
                         {
@@ -121,7 +128,8 @@ namespace WireBrainCoffeeEmployeeManager.Data.Migrations
                             DepartmentId = 5,
                             FirstName = "Vivaan",
                             IsDeveloper = true,
-                            LastName = "Mor"
+                            LastName = "Mor",
+                            Timestamp = (byte)0
                         },
                         new
                         {
@@ -129,7 +137,8 @@ namespace WireBrainCoffeeEmployeeManager.Data.Migrations
                             DepartmentId = 1,
                             FirstName = "Umesh",
                             IsDeveloper = false,
-                            LastName = "Mor"
+                            LastName = "Mor",
+                            Timestamp = (byte)0
                         },
                         new
                         {
@@ -137,7 +146,8 @@ namespace WireBrainCoffeeEmployeeManager.Data.Migrations
                             DepartmentId = 4,
                             FirstName = "Lokesh",
                             IsDeveloper = false,
-                            LastName = "Mor"
+                            LastName = "Mor",
+                            Timestamp = (byte)0
                         },
                         new
                         {
@@ -145,7 +155,8 @@ namespace WireBrainCoffeeEmployeeManager.Data.Migrations
                             DepartmentId = 3,
                             FirstName = "Naman",
                             IsDeveloper = false,
-                            LastName = "Mor"
+                            LastName = "Mor",
+                            Timestamp = (byte)0
                         },
                         new
                         {
@@ -153,7 +164,8 @@ namespace WireBrainCoffeeEmployeeManager.Data.Migrations
                             DepartmentId = 5,
                             FirstName = "Maulik",
                             IsDeveloper = true,
-                            LastName = "Mor"
+                            LastName = "Mor",
+                            Timestamp = (byte)0
                         });
                 });
 
